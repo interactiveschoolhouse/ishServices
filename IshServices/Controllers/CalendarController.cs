@@ -26,7 +26,7 @@ namespace IshServices.Controllers
             });
 
             EventsResource.ListRequest request = service.Events.List(_calendarID);
-            request.TimeMin = new DateTime(2017, 2, 1);
+            request.TimeMin = DateTime.Now;
             request.ShowDeleted = false;
             request.SingleEvents = true;
             request.MaxResults = 4;
@@ -36,7 +36,7 @@ namespace IshServices.Controllers
 
             if (events.Items == null)
             {
-                return null;
+                return new CalendarEvent[] { };
             }
 
             return events.Items.Select(evt =>
@@ -45,7 +45,8 @@ namespace IshServices.Controllers
                     Title = evt.Summary,
                     Description = evt.Description,
                     StartTime = evt.Start.DateTime,
-                    EndTime = evt.End.DateTime
+                    EndTime = evt.End.DateTime,
+                    Location = evt.Location
                 }
             );
 
