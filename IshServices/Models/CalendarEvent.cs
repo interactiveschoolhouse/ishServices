@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Web;
 
 namespace IshServices.Models
@@ -11,6 +12,13 @@ namespace IshServices.Models
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
         public string Description { get; set; }
-
+        public string Location { get; set; }
+        public string FormattedDescription
+        {
+            get
+            {
+                return Regex.Replace(Description, @"[\r\n]+", "<br/>");
+            }
+        }
     }
 }
