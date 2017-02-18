@@ -13,11 +13,43 @@ namespace IshServices.Models
         public DateTime? EndTime { get; set; }
         public string Description { get; set; }
         public string Location { get; set; }
-        public string FormattedDescription
+
+        public string FormattedStartDate
         {
             get
             {
-                return Regex.Replace(Description, @"[\r\n]+", "<br/>");
+                if (StartTime == null)
+                {
+                    return "Pending";
+                }
+
+                return StartTime.Value.ToString("ddd, MMM d");
+            }
+        }
+
+        public string FormattedTimeDuration
+        {
+            get
+            {
+                if (StartTime == null)
+                {
+                    return string.Empty;
+                }
+
+                if (EndTime == null)
+                {
+                    return StartTime.Value.ToString("h.mmtt");
+                }
+
+                return string.Format("{0:h.mmtt} - {1:h.mmtt}", StartTime.Value, EndTime.Value);
+            }
+        }
+
+        public string[] DescriptionLines
+        {
+            get
+            {
+                return Regex.Split(Description, @"[\r\n]+");
             }
         }
     }
