@@ -17,8 +17,23 @@ namespace IshServices.Controllers
 
         private static string _calendarID = ConfigurationManager.AppSettings["CalendarID"];
         private static string _apiKey = ConfigurationManager.AppSettings["CalendarApiKey"];
+        private static ExpiringCache<IEnumerable<CalendarEvent>> _cachedEvents = null;
         // GET api/<controller>
         public IEnumerable<CalendarEvent> Get()
+        {
+            if (_cachedEvents == null)
+            {
+                _cachedEvents = new ExpiringCache<IEnumerable<CalendarEvent>>(GetEvents(), TimeSpan.FromMinutes(5));
+            }
+            else if(_cachedEvents.IsExpired())
+            {
+                _cachedEvents.Refresh(GetEvents());
+            }
+
+            return _cachedEvents.Item;
+        }
+
+        private static IEnumerable<CalendarEvent> GetEvents()
         {
             var service = new CalendarService(new BaseClientService.Initializer()
             {
@@ -49,7 +64,6 @@ namespace IshServices.Controllers
                     Location = evt.Location
                 }
             );
-
         }
 
         // GET api/<controller>/5
