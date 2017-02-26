@@ -51,6 +51,11 @@ namespace IshServices.Models
         {
             get
             {
+                if (string.IsNullOrEmpty(Description))
+                {
+                    return new string[] { };
+                }
+
                 return Regex.Split(Description, @"[\r\n]+");
             }
         }
