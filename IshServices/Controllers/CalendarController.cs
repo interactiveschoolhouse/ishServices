@@ -23,7 +23,8 @@ namespace IshServices.Controllers
         {
             if (_cachedEvents == null)
             {
-                _cachedEvents = new ExpiringCache<IEnumerable<CalendarEvent>>(GetEvents(), TimeSpan.FromMinutes(5));
+                _cachedEvents = new ExpiringCache<IEnumerable<CalendarEvent>>(GetEvents(), 
+                    TimeSpan.FromMinutes(int.Parse(ConfigurationManager.AppSettings["GoogleCalendarMinutesToCacheEvents"])));
             }
             else if(_cachedEvents.IsExpired())
             {
@@ -44,7 +45,7 @@ namespace IshServices.Controllers
             request.TimeMin = DateTime.Now;
             request.ShowDeleted = false;
             request.SingleEvents = true;
-            request.MaxResults = 4;
+            request.MaxResults = int.Parse(ConfigurationManager.AppSettings["TakeGoogleCalendarItemsCount"]);
             request.OrderBy = EventsResource.ListRequest.OrderByEnum.StartTime;
 
             Events events = request.Execute();
@@ -54,7 +55,10 @@ namespace IshServices.Controllers
                 return new CalendarEvent[] { };
             }
 
-            return events.Items.Select(evt =>
+            return events.Items
+                .Where(evt => !string.IsNullOrEmpty(evt.Description))
+                .Take(int.Parse(ConfigurationManager.AppSettings["TakeCalendarItemsCount"]))
+                .Select(evt =>
                 new CalendarEvent()
                 {
                     Title = evt.Summary,
