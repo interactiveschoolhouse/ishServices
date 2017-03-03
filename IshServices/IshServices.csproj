@@ -118,6 +118,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Auth\ApiKeyAuthAttribute.cs" />
     <Compile Include="Controllers\CalendarController.cs" />
     <Compile Include="Controllers\ContactUsController.cs" />
     <Compile Include="Global.asax.cs">
@@ -126,6 +127,7 @@
     <Compile Include="Models\CalendarEvent.cs" />
     <Compile Include="Models\ContactUs.cs" />
     <Compile Include="Models\ExpiringCache.cs" />
+    <Compile Include="Models\ValidationException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ContactUsService.cs" />
   </ItemGroup>

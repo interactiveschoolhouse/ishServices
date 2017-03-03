@@ -1,4 +1,5 @@
-﻿using IshServices.Models;
+﻿using IshServices.Auth;
+using IshServices.Models;
 using IshServices.Services;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using System.Web.Http;
 
 namespace IshServices.Controllers
 {
+    [ApiKeyAuth]
     public class ContactUsController : ApiController
     {
 
