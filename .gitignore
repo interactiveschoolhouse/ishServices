@@ -5,6 +5,7 @@
 Web.config
 Web.Debug.config
 Web.Release.config
+app.config
 
 # User-specific files
 *.suo

@@ -16,6 +16,14 @@ namespace IshServices.Models
 
         public bool RegistrationAllowed { get; private set; } = true;
 
+        public string RegistrationName
+        {
+            get
+            {
+                return Title + " - " + FormattedStartDate + " " + FormattedTimeDuration;
+            }
+        }
+
         public string FormattedStartDate
         {
             get
