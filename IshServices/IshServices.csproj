@@ -125,7 +125,9 @@
     <Compile Include="Auth\ApiKeyAuthAttribute.cs" />
     <Compile Include="Controllers\CalendarController.cs" />
     <Compile Include="Controllers\ContactUsController.cs" />
+    <Compile Include="Controllers\RegistrationController.cs" />
     <Compile Include="Data\EventRegistrationRepository.cs" />
+    <Compile Include="Data\UnitOfWork.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -134,9 +136,12 @@
     <Compile Include="Models\CustomerRegistration.cs" />
     <Compile Include="Models\ExpiringCache.cs" />
     <Compile Include="Models\EventRegistration.cs" />
+    <Compile Include="Models\FieldError.cs" />
+    <Compile Include="Models\RegistrationResult.cs" />
     <Compile Include="Models\ValidationException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ContactUsService.cs" />
+    <Compile Include="Validators\EmailValidation.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

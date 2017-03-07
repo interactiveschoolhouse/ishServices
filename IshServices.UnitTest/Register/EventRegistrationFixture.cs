@@ -5,35 +5,36 @@ using MySql.Data.MySqlClient;
 using System.Configuration;
 using IshServices.Models;
 
-namespace IshServices.UnitTest.Calendar
+namespace IshServices.UnitTest.Register
 {
     [TestClass]
     public class EventRegistrationFixture
     {
-        private MySqlConnection _cn;
+        private UnitOfWork _unitOfWork;
         [TestInitialize]
         public void Setup()
         {
-            _cn = new MySqlConnection(ConfigurationManager.ConnectionStrings["IshDb"].ConnectionString);
-            _cn.Open();
+            _unitOfWork = new UnitOfWork(ConfigurationManager.ConnectionStrings["IshDb"].ConnectionString);
         }
 
         [TestCleanup]
         public void TearDown()
         {
-            _cn.Dispose();
+            _unitOfWork.Dispose();
         }
 
         [TestMethod]
         public void SaveCustomerRegistration()
         {
-            EventRegistrationRepository repo = new EventRegistrationRepository(_cn);
+            EventRegistrationRepository repo = new EventRegistrationRepository(_unitOfWork);
 
             EventRegistration newRegistration = new EventRegistration()
             {
                 RegistrationId = DateTime.Now.ToFileTime(),
                 CustomerInfo = new CustomerRegistration()
                 {
+                    EventName = "Event Name",
+                    EventDescription = "Event Description",
                     Name = "Guy Smiley",
                     SpecialInstructions = "Really needy"
                 }
@@ -44,6 +45,7 @@ namespace IshServices.UnitTest.Calendar
             EventRegistration savedRegistration = repo.Get(newRegistration.RegistrationId);
             Assert.IsNotNull(savedRegistration.CustomerInfo);
             Assert.AreEqual("Really needy", savedRegistration.CustomerInfo.SpecialInstructions);
+            Assert.AreEqual("Event Description", savedRegistration.CustomerInfo.EventDescription);
         }
     }
 }

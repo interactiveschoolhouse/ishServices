@@ -59,7 +59,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Calendar\CalendarFixture.cs" />
-    <Compile Include="Calendar\EventRegistrationFixture.cs" />
+    <Compile Include="Register\EventRegistrationFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

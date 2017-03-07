@@ -7,7 +7,8 @@ namespace IshServices.Models
 {
     public class CustomerRegistration
     {
-        public string ClassName { get; set; }
+        public string EventName { get; set; }
+        public string EventDescription { get; set; }
         public string Name { get; set; }
         public string Address { get; set; }
         public string Town { get; set; }

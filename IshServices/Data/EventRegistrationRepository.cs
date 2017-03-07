@@ -9,19 +9,18 @@ namespace IshServices.Data
 {
     public class EventRegistrationRepository
     {
-        private MySqlConnection _cn;
-        public EventRegistrationRepository(MySqlConnection cn)
+        private UnitOfWork _unitOfWork;
+        public EventRegistrationRepository(UnitOfWork unitOfWork)
         {
-            _cn = cn;
+            _unitOfWork = unitOfWork;
         }
 
         public void Save(EventRegistration registration)
         {
-            MySqlCommand cmd = _cn.CreateCommand();
+            MySqlCommand cmd = _unitOfWork.CreateCommand(@"insert into Registrations(RegistrationId, RegistrationData, Created, Completed)
+                Values(@RegistrationId, @RegistrationData, @Created, @Completed)",
+                System.Data.CommandType.Text);
 
-            cmd.CommandText = @"insert into Registrations(RegistrationId, RegistrationData, Created, Completed)
-                Values(@RegistrationId, @RegistrationData, @Created, @Completed)";
-            cmd.CommandType = System.Data.CommandType.Text;
 
             cmd.Parameters.AddWithValue("@RegistrationId", registration.RegistrationId);
             cmd.Parameters.AddWithValue("@RegistrationData",Newtonsoft.Json.JsonConvert.SerializeObject(registration.CustomerInfo));
@@ -33,10 +32,8 @@ namespace IshServices.Data
 
         public EventRegistration Get(long id)
         {
-            MySqlCommand cmd = _cn.CreateCommand();
-
-            cmd.CommandText = @"select RegistrationId, RegistrationData, Created, Completed From Registrations Where RegistrationId = @RegistrationId";
-            cmd.CommandType = System.Data.CommandType.Text;
+            MySqlCommand cmd = _unitOfWork.CreateCommand(@"select RegistrationId, RegistrationData, Created, Completed From Registrations Where RegistrationId = @RegistrationId",
+                System.Data.CommandType.Text);
 
             cmd.Parameters.AddWithValue("@RegistrationId", id);
 
@@ -52,7 +49,6 @@ namespace IshServices.Data
                     registration.Created = r.GetDateTime(2);
                     registration.Completed = r.GetBoolean(3);
                 }
-
             }
 
             return registration;
