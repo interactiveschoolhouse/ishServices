@@ -133,7 +133,8 @@
     </Compile>
     <Compile Include="Models\CalendarEvent.cs" />
     <Compile Include="Models\ContactUs.cs" />
-    <Compile Include="Models\CustomerRegistration.cs" />
+    <Compile Include="Models\RegistrationConfig.cs" />
+    <Compile Include="Models\RegistrationRequest.cs" />
     <Compile Include="Models\ExpiringCache.cs" />
     <Compile Include="Models\EventRegistration.cs" />
     <Compile Include="Models\FieldError.cs" />

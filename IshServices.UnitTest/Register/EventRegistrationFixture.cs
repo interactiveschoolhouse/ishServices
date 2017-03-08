@@ -31,7 +31,7 @@ namespace IshServices.UnitTest.Register
             EventRegistration newRegistration = new EventRegistration()
             {
                 RegistrationId = DateTime.Now.ToFileTime(),
-                CustomerInfo = new CustomerRegistration()
+                CustomerInfo = new RegistrationRequest()
                 {
                     EventName = "Event Name",
                     EventDescription = "Event Description",

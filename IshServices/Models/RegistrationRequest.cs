@@ -5,7 +5,7 @@ using System.Web;
 
 namespace IshServices.Models
 {
-    public class CustomerRegistration
+    public class RegistrationRequest
     {
         public string EventName { get; set; }
         public string EventDescription { get; set; }

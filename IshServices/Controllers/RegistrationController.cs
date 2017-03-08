@@ -12,7 +12,7 @@ namespace IshServices.Controllers
     public class RegistrationController : ApiController
     {
         // POST api/<controller>
-        public IHttpActionResult Post([FromBody]CustomerRegistration registration)
+        public IHttpActionResult Post([FromBody]RegistrationRequest registration)
         {
             //TODO: convert registration to RegistrationResult if valid data
             //save registration

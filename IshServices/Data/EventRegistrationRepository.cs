@@ -45,7 +45,7 @@ namespace IshServices.Data
                 {
                     registration = new EventRegistration();
                     registration.RegistrationId = r.GetInt64(0);
-                    registration.CustomerInfo = Newtonsoft.Json.JsonConvert.DeserializeObject<CustomerRegistration>(r.GetString(1));
+                    registration.CustomerInfo = Newtonsoft.Json.JsonConvert.DeserializeObject<RegistrationRequest>(r.GetString(1));
                     registration.Created = r.GetDateTime(2);
                     registration.Completed = r.GetBoolean(3);
                 }

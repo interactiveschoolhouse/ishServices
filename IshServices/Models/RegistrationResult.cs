@@ -23,15 +23,66 @@ namespace IshServices.Models
 
         public decimal PaymentAmount { get; private set; }
 
-        public bool IsValid { get; private set; }
-
-        public IEnumerable<FieldError> Errors { get; set; } = new List<FieldError>();
-
-        public static RegistrationResult Process(CustomerRegistration request)
+        public bool IsValid
         {
-            //TODO: validate, unit test this
-            return new RegistrationResult();
+            get
+            {
+                return Errors.Count > 0;
+            }
         }
 
+        public List<FieldError> Errors { get; set; } = new List<FieldError>();
+
+        public bool HasError(string errorKey)
+        {
+            return Errors.Any(err => err.Name == errorKey);
+        }
+
+        public void ParseName(string name)
+        {
+            int lastNameIndex = name.IndexOf(" ");
+
+            if (lastNameIndex != -1)
+            {
+                FirstName = name.Substring(0, lastNameIndex).Trim();
+                LastName = name.Substring(lastNameIndex).Trim();
+            }
+            else
+            {
+                FirstName = name.Trim();
+            }
+        }
+
+        public static RegistrationResult Process(RegistrationRequest request)
+        {
+            RegistrationResult result = new RegistrationResult();
+            if (string.IsNullOrWhiteSpace(request.Name))
+            {
+                result.Errors.Add(new FieldError("Name", "Name is required"));
+            }
+            else
+            {
+                result.ParseName(request.Name);
+            }
+
+            if (request.PaymentAmount <= 0)
+            {
+                result.Errors.Add(new FieldError("PaymentAmount", "Payment amount is required"));
+            }
+
+            return result;
+        }
+
+        public string GetError(string key)
+        {
+            var error = Errors.Find(err => err.Name == key);
+
+            if (error != null)
+            {
+                return error.Description;
+            }
+
+            return null;
+        }
     }
 }

@@ -7,7 +7,13 @@ namespace IshServices.Models
 {
     public class FieldError
     {
-        public string Name { get; set; }
-        public string Description { get; set; }
+        public FieldError(string name, string description)
+        {
+            Name = name;
+            Description = description;
+        }
+
+        public string Name { get; private set; }
+        public string Description { get; private set; }
     }
 }
