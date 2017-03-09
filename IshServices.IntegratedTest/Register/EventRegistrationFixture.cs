@@ -5,7 +5,7 @@ using MySql.Data.MySqlClient;
 using System.Configuration;
 using IshServices.Models;
 
-namespace IshServices.UnitTest.Register
+namespace IshServices.IntegratedTest.Register
 {
     [TestClass]
     public class EventRegistrationFixture

@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using IshServices.Models;
 using System.Linq;
+using IshServices.Validators;
 
 namespace IshServices.UnitTest.Register
 {
@@ -13,14 +14,14 @@ namespace IshServices.UnitTest.Register
         {
             RegistrationRequest request = new RegistrationRequest()
             {
-                Name = null
+                Name = null,
             };
 
-            RegistrationResult result = RegistrationResult.Process(request);
+            RegistrationResult result = RegistrationResult.Process(request, null);
 
             Assert.IsFalse(result.IsValid);
 
-            AssertResultHasError(result, "Name");
+            Assert.AreEqual("Name is required", result.GetError("Name"));
         }
 
         [TestMethod]
@@ -31,7 +32,7 @@ namespace IshServices.UnitTest.Register
                 Name = "Shelly Von Trapp"
             };
 
-            RegistrationResult result = RegistrationResult.Process(request);
+            RegistrationResult result = RegistrationResult.Process(request, null);
 
             Assert.AreEqual("Shelly", result.FirstName);
             Assert.AreEqual("Von Trapp", result.LastName);
@@ -45,45 +46,67 @@ namespace IshServices.UnitTest.Register
                 Name = "Shelly"
             };
 
-            RegistrationResult result = RegistrationResult.Process(request);
+            RegistrationResult result = RegistrationResult.Process(request, null);
 
             Assert.AreEqual("Shelly", result.FirstName);
         }
 
         [TestMethod]
-        public void CreateRegistrationResultWithoutPaymentAmount()
-        {
-            RegistrationRequest request = new RegistrationRequest()
-            {
-                PaymentAmount = 0
-            };
-
-            RegistrationResult result = RegistrationResult.Process(request);
-
-            AssertResultHasError(result, "PaymentAmount");
-        }
-
-        [TestMethod]
         public void CreateRegistrationResultWithPaymentAmountOutsideAllowableRange()
         {
-            RegistrationConfig regConfig = new RegistrationConfig(5, 500);
-
             RegistrationRequest request = new RegistrationRequest()
             {
                 PaymentAmount = 600
             };
 
-            RegistrationResult result = RegistrationResult.Process(request);
+            RegistrationResult result = RegistrationResult.Process(request, new[] { new PaymentAmountValidator(5, 500) });
 
             Assert.AreEqual("Payment amount must be between $5 and $500", result.GetError("PaymentAmount"));
         }
 
-        private static void AssertResultHasError(RegistrationResult result, string errorKey)
+        [TestMethod]
+        public void CreateRegistrationResultWithInvalidPhone()
         {
-            if (!result.HasError(errorKey))
+            RegistrationRequest request = new RegistrationRequest()
             {
-                Assert.Fail($"Expected result to have error with key: {errorKey}");
-            }
+                Phone = "123"
+            };
+
+            RegistrationResult result = RegistrationResult.Process(request, new[] { new PhoneValidator() });
+
+            Assert.AreEqual("A phone number is required", result.GetError("Phone"));
+        }
+
+        [TestMethod]
+        public void CreateRegistrationResultWithShortPhone()
+        {
+            RegistrationRequest request = new RegistrationRequest()
+            {
+                Name = "Joe",
+                Phone = "283-5266"
+            };
+
+            RegistrationResult result = RegistrationResult.Process(request, new[] { new PhoneValidator() });
+
+            Assert.AreEqual("413", result.PhoneAreaCode);
+            Assert.AreEqual("283", result.PhonePrefix);
+            Assert.AreEqual("5266", result.PhoneSuffix);
+        }
+
+        [TestMethod]
+        public void CreateRegistrationResultWithFullPhone()
+        {
+            RegistrationRequest request = new RegistrationRequest()
+            {
+                Name = "Joe",
+                Phone = "(508) 283-5266"
+            };
+
+            RegistrationResult result = RegistrationResult.Process(request, new[] { new PhoneValidator() });
+
+            Assert.AreEqual("508", result.PhoneAreaCode);
+            Assert.AreEqual("283", result.PhonePrefix);
+            Assert.AreEqual("5266", result.PhoneSuffix);
         }
 
     }

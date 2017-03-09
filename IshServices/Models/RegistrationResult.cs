@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IshServices.Validators;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -27,11 +28,11 @@ namespace IshServices.Models
         {
             get
             {
-                return Errors.Count > 0;
+                return Errors.Count == 0;
             }
         }
 
-        public List<FieldError> Errors { get; set; } = new List<FieldError>();
+        public List<ValidatorResult> Errors { get; private set; } = new List<ValidatorResult>();
 
         public bool HasError(string errorKey)
         {
@@ -53,24 +54,57 @@ namespace IshServices.Models
             }
         }
 
-        public static RegistrationResult Process(RegistrationRequest request)
+        public static RegistrationResult Process(RegistrationRequest request, IEnumerable<Validator<RegistrationRequest>> validations)
         {
-            RegistrationResult result = new RegistrationResult();
+            RegistrationResult registrationResult = new RegistrationResult();
             if (string.IsNullOrWhiteSpace(request.Name))
             {
-                result.Errors.Add(new FieldError("Name", "Name is required"));
+                registrationResult.Errors.Add(ValidatorResult.Error("Name", "Name is required"));
+            }
+
+            if (validations != null)
+            {
+                foreach(var validator in validations)
+                {
+                    var validationResult = validator.Validate(request);
+
+                    if (!validationResult.IsValid)
+                    {
+                        registrationResult.Errors.Add(validationResult);
+                    }
+                }
+            }
+
+            if (registrationResult.IsValid)
+            {
+                registrationResult.ParseName(request.Name);
+                registrationResult.ParsePhone(request.Phone);
+            }
+
+            return registrationResult;
+        }
+
+        private void ParsePhone(string phone)
+        {
+            if (phone == null)
+            {
+                return;
+            }
+
+            string digitsOnly = new string(phone.Where(ch => Char.IsDigit(ch)).ToArray());
+            if (digitsOnly.Length == 7)
+            {
+                PhoneAreaCode = "413";
+                PhonePrefix = digitsOnly.Substring(0, 3);
+                PhoneSuffix = digitsOnly.Substring(3);
             }
             else
             {
-                result.ParseName(request.Name);
-            }
+                PhoneAreaCode = digitsOnly.Substring(0, 3);
+                PhonePrefix = digitsOnly.Substring(3, 3);
+                PhoneSuffix = digitsOnly.Substring(6);
 
-            if (request.PaymentAmount <= 0)
-            {
-                result.Errors.Add(new FieldError("PaymentAmount", "Payment amount is required"));
             }
-
-            return result;
         }
 
         public string GetError(string key)
