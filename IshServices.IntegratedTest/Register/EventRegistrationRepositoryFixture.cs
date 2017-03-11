@@ -4,11 +4,12 @@ using IshServices.Data;
 using MySql.Data.MySqlClient;
 using System.Configuration;
 using IshServices.Models;
+using IshServices.Validators;
 
 namespace IshServices.IntegratedTest.Register
 {
     [TestClass]
-    public class EventRegistrationFixture
+    public class EventRegistrationRepositoryFixture
     {
         private UnitOfWork _unitOfWork;
         [TestInitialize]
@@ -26,26 +27,29 @@ namespace IshServices.IntegratedTest.Register
         [TestMethod]
         public void SaveCustomerRegistration()
         {
-            EventRegistrationRepository repo = new EventRegistrationRepository(_unitOfWork);
+            ClassRegistrationRepository repo = new ClassRegistrationRepository(_unitOfWork);
+
+            RegistrationRequest request = new RegistrationRequest()
+            {
+                Name = "Joe Smith",
+                SpecialInstructions = "Really needy",
+                EventDescription = "Event Description"
+            };
+
+            var classRegistration = ClassRegistration.Process(request, new Validator<RegistrationRequest>[] { });
 
             EventRegistration newRegistration = new EventRegistration()
             {
                 RegistrationId = DateTime.Now.ToFileTime(),
-                CustomerInfo = new RegistrationRequest()
-                {
-                    EventName = "Event Name",
-                    EventDescription = "Event Description",
-                    Name = "Guy Smiley",
-                    SpecialInstructions = "Really needy"
-                }
+                Registration = classRegistration
             };
 
             repo.Save(newRegistration);
 
             EventRegistration savedRegistration = repo.Get(newRegistration.RegistrationId);
-            Assert.IsNotNull(savedRegistration.CustomerInfo);
-            Assert.AreEqual("Really needy", savedRegistration.CustomerInfo.SpecialInstructions);
-            Assert.AreEqual("Event Description", savedRegistration.CustomerInfo.EventDescription);
+            Assert.IsNotNull(savedRegistration.Registration);
+            Assert.AreEqual("Really needy", savedRegistration.Registration.SpecialInstructions);
+            Assert.AreEqual("Event Description", savedRegistration.Registration.EventDescription);
         }
     }
 }

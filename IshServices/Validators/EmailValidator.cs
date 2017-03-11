@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IshServices.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -6,7 +7,7 @@ using System.Web;
 
 namespace IshServices.Validators
 {
-    public class EmailValidation
+    public class EmailValidator : Validator<RegistrationRequest>
     {
         public static bool IsValid(string email)
         {
@@ -28,6 +29,16 @@ namespace IshServices.Validators
             }
 
             return true;
+        }
+
+        public ValidatorResult Validate(RegistrationRequest target)
+        {
+            if (IsValid(target.Email))
+            {
+                return ValidatorResult.Ok();
+            }
+
+            return ValidatorResult.Error("Email", "A valid email address is required");
         }
     }
 }

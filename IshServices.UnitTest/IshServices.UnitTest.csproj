@@ -55,7 +55,7 @@
   <ItemGroup>
     <Compile Include="Calendar\CalendarFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Register\RegistrationResultFixture.cs" />
+    <Compile Include="Register\ClassRegistrationFixture.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IshServices\IshServices.csproj">

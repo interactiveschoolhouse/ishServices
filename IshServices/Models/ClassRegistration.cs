@@ -6,9 +6,9 @@ using System.Web;
 
 namespace IshServices.Models
 {
-    public class RegistrationResult
+    public class ClassRegistration
     {
-        private RegistrationResult()
+        private ClassRegistration()
         {
 
         }
@@ -23,6 +23,10 @@ namespace IshServices.Models
         public string Email { get; private set; }
 
         public decimal PaymentAmount { get; private set; }
+
+        public string SpecialInstructions { get; private set; }
+        public string EventName { get; private set; }
+        public string EventDescription { get; private set; }
 
         public bool IsValid
         {
@@ -54,9 +58,9 @@ namespace IshServices.Models
             }
         }
 
-        public static RegistrationResult Process(RegistrationRequest request, IEnumerable<Validator<RegistrationRequest>> validations)
+        public static ClassRegistration Process(RegistrationRequest request, IEnumerable<Validator<RegistrationRequest>> validations)
         {
-            RegistrationResult registrationResult = new RegistrationResult();
+            ClassRegistration registrationResult = new ClassRegistration();
             if (string.IsNullOrWhiteSpace(request.Name))
             {
                 registrationResult.Errors.Add(ValidatorResult.Error("Name", "Name is required"));
@@ -79,6 +83,13 @@ namespace IshServices.Models
             {
                 registrationResult.ParseName(request.Name);
                 registrationResult.ParsePhone(request.Phone);
+                registrationResult.PaymentAmount = request.PaymentAmount;
+                registrationResult.Email = request.Email;
+                registrationResult.Address1 = request.Address;
+                registrationResult.City = request.Town;
+                registrationResult.SpecialInstructions = request.SpecialInstructions;
+                registrationResult.EventName = request.EventName;
+                registrationResult.EventDescription = request.EventDescription;
             }
 
             return registrationResult;

@@ -59,7 +59,7 @@ namespace IshServices.Services
                 throw new ValidationException("Input not valid");
             }
 
-            if (!EmailValidation.IsValid(data.Email))
+            if (!EmailValidator.IsValid(data.Email))
             {
                 throw new ValidationException("Email not valid");
             }
