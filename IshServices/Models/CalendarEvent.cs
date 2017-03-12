@@ -13,8 +13,20 @@ namespace IshServices.Models
         public DateTime? EndTime { get; set; }
         public string Description { get; set; }
         public string Location { get; set; }
+        public string ColorId { get; set; }
 
-        public bool RegistrationAllowed { get; private set; } = true;
+        public bool RegistrationAllowed
+        {
+            get
+            {
+                if (Description.IndexOf("register online", StringComparison.CurrentCultureIgnoreCase) != -1)
+                {
+                    return true;
+                }
+
+                return false;
+            }
+        }
 
         public string RegistrationName
         {
@@ -66,6 +78,16 @@ namespace IshServices.Models
 
                 return Regex.Split(Description, @"[\r\n]+");
             }
+        }
+
+        public bool IncludeOnHomeEvents()
+        {
+            if (FormattedStartDate == "Pending")
+            {
+                return false;
+            }
+            
+            return true;
         }
     }
 }

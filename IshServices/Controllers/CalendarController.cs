@@ -56,20 +56,20 @@ namespace IshServices.Controllers
             {
                 return new CalendarEvent[] { };
             }
-
             return events.Items
                 .Where(evt => !string.IsNullOrEmpty(evt.Description))
                 .Take(int.Parse(ConfigurationManager.AppSettings["TakeCalendarItemsCount"]))
                 .Select(evt =>
                 new CalendarEvent()
                 {
+                    ColorId = evt.ColorId,
                     Title = evt.Summary,
                     Description = evt.Description,
                     StartTime = evt.Start.DateTime,
                     EndTime = evt.End.DateTime,
                     Location = evt.Location
-                }
-            );
+                })
+                .Where(ce => ce.IncludeOnHomeEvents());
         }
 
         // GET api/<controller>/5
