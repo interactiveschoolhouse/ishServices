@@ -10,9 +10,13 @@ namespace IshServices.Models
     {
         private ClassRegistration()
         {
-
+            RegistrationId = DateTime.Now.ToFileTime();
+            Created = DateTime.Now;
         }
+
         public long RegistrationId { get; private set; }
+        public DateTime Created { get; private set; }
+        public bool Completed { get; private set; }
         public string FirstName { get; private set; }
         public string LastName { get; private set; }
         public string Address1 { get; private set; }
@@ -83,7 +87,9 @@ namespace IshServices.Models
             {
                 registrationResult.ParseName(request.Name);
                 registrationResult.ParsePhone(request.Phone);
-                registrationResult.PaymentAmount = request.PaymentAmount;
+                decimal amount;
+                decimal.TryParse(request.PaymentAmount, out amount);
+                registrationResult.PaymentAmount = amount;
                 registrationResult.Email = request.Email;
                 registrationResult.Address1 = request.Address;
                 registrationResult.City = request.Town;

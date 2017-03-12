@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
+using System.Web.Http.Cors;
 
 namespace IshServices
 {
@@ -19,6 +20,18 @@ namespace IshServices
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
+
+            EnableCrossSiteRequests(config);
+        }
+
+        private static void EnableCrossSiteRequests(HttpConfiguration config)
+        {
+            var cors = new EnableCorsAttribute(
+                origins: "*",
+                headers: "*",
+                methods: "*");
+            cors.PreflightMaxAge = System.Convert.ToInt64(TimeSpan.FromDays(1).TotalSeconds);
+            config.EnableCors(cors);
         }
     }
 }

@@ -56,7 +56,7 @@ namespace IshServices.UnitTest.Register
         {
             RegistrationRequest request = new RegistrationRequest()
             {
-                PaymentAmount = 600
+                PaymentAmount = "600"
             };
 
             ClassRegistration result = ClassRegistration.Process(request, new[] { new PaymentAmountValidator(5, 500) });
@@ -70,7 +70,7 @@ namespace IshServices.UnitTest.Register
             RegistrationRequest request = new RegistrationRequest()
             {
                 Name = "Sweet Ride",
-                PaymentAmount = 300
+                PaymentAmount = "300"
             };
 
             ClassRegistration result = ClassRegistration.Process(request, new[] { new PaymentAmountValidator(5, 500) });

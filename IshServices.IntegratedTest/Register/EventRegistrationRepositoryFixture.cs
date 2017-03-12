@@ -38,18 +38,12 @@ namespace IshServices.IntegratedTest.Register
 
             var classRegistration = ClassRegistration.Process(request, new Validator<RegistrationRequest>[] { });
 
-            EventRegistration newRegistration = new EventRegistration()
-            {
-                RegistrationId = DateTime.Now.ToFileTime(),
-                Registration = classRegistration
-            };
+            repo.Save(classRegistration);
 
-            repo.Save(newRegistration);
-
-            EventRegistration savedRegistration = repo.Get(newRegistration.RegistrationId);
-            Assert.IsNotNull(savedRegistration.Registration);
-            Assert.AreEqual("Really needy", savedRegistration.Registration.SpecialInstructions);
-            Assert.AreEqual("Event Description", savedRegistration.Registration.EventDescription);
+            ClassRegistration savedRegistration = repo.Get(classRegistration.RegistrationId);
+            Assert.IsNotNull(savedRegistration.RegistrationId);
+            Assert.AreEqual("Really needy", savedRegistration.SpecialInstructions);
+            Assert.AreEqual("Event Description", savedRegistration.EventDescription);
         }
     }
 }

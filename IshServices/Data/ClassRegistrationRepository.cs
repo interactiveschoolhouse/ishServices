@@ -18,7 +18,7 @@ namespace IshServices.Data
             _unitOfWork = unitOfWork;
         }
 
-        public void Save(EventRegistration registration)
+        public void Save(ClassRegistration registration)
         {
             MySqlCommand cmd = _unitOfWork.CreateCommand(@"insert into Registrations(RegistrationId, RegistrationData, Created, Completed)
                 Values(@RegistrationId, @RegistrationData, @Created, @Completed)",
@@ -26,21 +26,21 @@ namespace IshServices.Data
 
 
             cmd.Parameters.AddWithValue("@RegistrationId", registration.RegistrationId);
-            cmd.Parameters.AddWithValue("@RegistrationData",Newtonsoft.Json.JsonConvert.SerializeObject(registration.Registration));
+            cmd.Parameters.AddWithValue("@RegistrationData",Newtonsoft.Json.JsonConvert.SerializeObject(registration));
             cmd.Parameters.AddWithValue("@Created", registration.Created);
             cmd.Parameters.AddWithValue("@Completed", registration.Completed);
 
             cmd.ExecuteNonQuery();
         }
 
-        public EventRegistration Get(long id)
+        public ClassRegistration Get(long id)
         {
             MySqlCommand cmd = _unitOfWork.CreateCommand(@"select RegistrationId, RegistrationData, Created, Completed From Registrations Where RegistrationId = @RegistrationId",
                 System.Data.CommandType.Text);
 
             cmd.Parameters.AddWithValue("@RegistrationId", id);
 
-            EventRegistration registration = null;
+            ClassRegistration registration = null;
 
             var contractResolver = new PrivateMemberContractResolver();
             var deserializeSettings = new JsonSerializerSettings()
@@ -52,11 +52,7 @@ namespace IshServices.Data
             {
                 if (r.Read())
                 {
-                    registration = new EventRegistration();
-                    registration.RegistrationId = r.GetInt64(0);
-                    registration.Registration = JsonConvert.DeserializeObject<ClassRegistration>(r.GetString(1), deserializeSettings);
-                    registration.Created = r.GetDateTime(2);
-                    registration.Completed = r.GetBoolean(3);
+                    registration = JsonConvert.DeserializeObject<ClassRegistration>(r.GetString(1), deserializeSettings);
                 }
             }
 

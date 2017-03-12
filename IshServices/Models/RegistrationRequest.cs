@@ -14,7 +14,7 @@ namespace IshServices.Models
         public string Town { get; set; }
         public string Phone { get; set; }
         public string Email { get; set; }
-        public decimal PaymentAmount { get; set; }
+        public string PaymentAmount { get; set; }
         public string SpecialInstructions { get; set; }
     }
 }
