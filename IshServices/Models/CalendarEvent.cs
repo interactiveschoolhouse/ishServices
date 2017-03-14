@@ -36,6 +36,12 @@ namespace IshServices.Models
             }
         }
 
+        private static TimeZoneInfo _est = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
+        private static DateTime ToEst(DateTime serverTime)
+        {
+            return TimeZoneInfo.ConvertTimeFromUtc(serverTime.ToUniversalTime(), _est);
+        }
+
         public string FormattedStartDate
         {
             get
@@ -45,7 +51,7 @@ namespace IshServices.Models
                     return "Pending";
                 }
 
-                return StartTime.Value.ToString("ddd, MMM d");
+                return ToEst(StartTime.Value).ToString("ddd, MMM d");
             }
         }
 
@@ -60,10 +66,10 @@ namespace IshServices.Models
 
                 if (EndTime == null)
                 {
-                    return StartTime.Value.ToString("h.mmtt");
+                    return ToEst(StartTime.Value).ToString("h.mmtt");
                 }
 
-                return string.Format("{0:h.mmtt} - {1:h.mmtt}", StartTime.Value, EndTime.Value);
+                return string.Format("{0:h.mmtt} - {1:h.mmtt}", ToEst(StartTime.Value), ToEst(EndTime.Value));
             }
         }
 

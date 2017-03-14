@@ -19,11 +19,25 @@ namespace IshServices.Models
         public bool Completed { get; private set; }
         public string FirstName { get; private set; }
         public string LastName { get; private set; }
+        public string FullName
+        {
+            get
+            {
+                return FirstName + " " + LastName;
+            }
+        }
         public string Address1 { get; private set; }
         public string City { get; private set; }
         public string PhoneAreaCode { get; private set; }
         public string PhonePrefix { get; private set; }
         public string PhoneSuffix { get; private set; }
+        public string FormattedPhone
+        {
+            get
+            {
+                return $"({PhoneAreaCode}) {PhonePrefix}-{PhoneSuffix}";
+            }
+        }
         public string Email { get; private set; }
 
         public decimal PaymentAmount { get; private set; }

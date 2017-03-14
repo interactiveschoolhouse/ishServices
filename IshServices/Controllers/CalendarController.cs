@@ -25,18 +25,25 @@ namespace IshServices.Controllers
         {
             if (_cachedEvents == null)
             {
-                _cachedEvents = new ExpiringCache<IEnumerable<CalendarEvent>>(GetEvents(), 
+                _cachedEvents = new ExpiringCache<IEnumerable<CalendarEvent>>(GetEvents(null, null), 
                     TimeSpan.FromMinutes(int.Parse(ConfigurationManager.AppSettings["GoogleCalendarMinutesToCacheEvents"])));
             }
             else if(_cachedEvents.IsExpired())
             {
-                _cachedEvents.Refresh(GetEvents());
+                _cachedEvents.Refresh(GetEvents(null, null));
             }
 
             return _cachedEvents.Item;
         }
 
-        private static IEnumerable<CalendarEvent> GetEvents()
+        [HttpGet]
+        [Route("api/calendar/filtered")]
+        public IEnumerable<CalendarEvent> GetFilteredEvents(int numToTake, bool registerEventsOnly)
+        {
+            return GetEvents(numToTake, registerEventsOnly);
+        }
+
+        private static IEnumerable<CalendarEvent> GetEvents(int? numToTake, bool? registerEventsOnly)
         {
             var service = new CalendarService(new BaseClientService.Initializer()
             {
@@ -44,7 +51,7 @@ namespace IshServices.Controllers
             });
 
             EventsResource.ListRequest request = service.Events.List(_calendarID);
-            request.TimeMin = DateTime.Now;
+            request.TimeMin = DateTime.UtcNow;
             request.ShowDeleted = false;
             request.SingleEvents = true;
             request.MaxResults = int.Parse(ConfigurationManager.AppSettings["TakeGoogleCalendarItemsCount"]);
@@ -56,9 +63,8 @@ namespace IshServices.Controllers
             {
                 return new CalendarEvent[] { };
             }
-            return events.Items
+            var eventsQuery = events.Items
                 .Where(evt => !string.IsNullOrEmpty(evt.Description))
-                .Take(int.Parse(ConfigurationManager.AppSettings["TakeCalendarItemsCount"]))
                 .Select(evt =>
                 new CalendarEvent()
                 {
@@ -70,6 +76,13 @@ namespace IshServices.Controllers
                     Location = evt.Location
                 })
                 .Where(ce => ce.IncludeOnHomeEvents());
+
+            if (registerEventsOnly.GetValueOrDefault())
+            {
+                eventsQuery = eventsQuery.Where(evt => evt.RegistrationAllowed == true);
+            }
+
+            return eventsQuery.Take(numToTake.GetValueOrDefault(int.Parse(ConfigurationManager.AppSettings["TakeCalendarItemsCount"])));
         }
 
         // GET api/<controller>/5
