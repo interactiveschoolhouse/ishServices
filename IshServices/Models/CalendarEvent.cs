@@ -14,6 +14,7 @@ namespace IshServices.Models
         public string Description { get; set; }
         public string Location { get; set; }
         public string ColorId { get; set; }
+        public string Id { get; set; }
 
         public bool RegistrationAllowed
         {

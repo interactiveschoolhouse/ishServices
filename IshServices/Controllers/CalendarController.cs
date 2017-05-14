@@ -63,32 +63,93 @@ namespace IshServices.Controllers
             {
                 return new CalendarEvent[] { };
             }
+
             var eventsQuery = events.Items
-                .Where(evt => !string.IsNullOrEmpty(evt.Description))
-                .Select(evt =>
-                new CalendarEvent()
-                {
-                    ColorId = evt.ColorId,
-                    Title = evt.Summary,
-                    Description = evt.Description,
-                    StartTime = evt.Start.DateTime,
-                    EndTime = evt.End.DateTime,
-                    Location = evt.Location
-                })
-                .Where(ce => ce.IncludeOnHomeEvents());
+            .Where(evt => !string.IsNullOrEmpty(evt.Description))
+            .Select(evt => MapToEventDto(evt))
+            .Where(ce => ce.IncludeOnHomeEvents());
 
             if (registerEventsOnly.GetValueOrDefault())
             {
                 eventsQuery = eventsQuery.Where(evt => evt.RegistrationAllowed == true);
             }
 
+            if (ConfigurationManager.AppSettings["TestMode"] == "true")
+            {
+                var baseQuery = eventsQuery.Take(numToTake.GetValueOrDefault(int.Parse(ConfigurationManager.AppSettings["TakeCalendarItemsCount"]) - 1)).ToList();
+
+                baseQuery.Insert(0, CreateTestEvent());
+
+                return baseQuery;
+            }
+
             return eventsQuery.Take(numToTake.GetValueOrDefault(int.Parse(ConfigurationManager.AppSettings["TakeCalendarItemsCount"])));
+        }
+
+        private const string _testEventId = "testidbogus1";
+        private static CalendarEvent CreateTestEvent()
+        {
+            return new CalendarEvent()
+            {
+                Id = _testEventId,
+                Title = "Jeff's putting #winning special \"characters\" in the title > 500",
+                Description = "Jeff's putting special characters #winning in the description < 100, \"hello\", register online at www.interactiveschoolhouse.com",
+                StartTime = DateTime.Now,
+                EndTime = DateTime.Now,
+                Location = "Jeff's location"
+            };
+        }
+
+        private static CalendarEvent MapToEventDto(Event sourceEvent)
+        {
+            if(sourceEvent == null)
+            {
+                return new CalendarEvent()
+                {
+                    Title = "Unable to find event",
+                    Description = "Unable to find event",
+                    StartTime = DateTime.Now,
+                    EndTime = DateTime.Now
+                };
+            }
+
+            return new CalendarEvent()
+            {
+                ColorId = sourceEvent.ColorId,
+                Title = sourceEvent.Summary,
+                Description = sourceEvent.Description,
+                StartTime = sourceEvent.Start.DateTime,
+                EndTime = sourceEvent.End.DateTime,
+                Location = sourceEvent.Location,
+                Id = sourceEvent.Id
+            };
         }
 
         // GET api/<controller>/5
         public CalendarEvent Get(string id)
         {
-            return new CalendarEvent();
+            try
+            {
+                if (ConfigurationManager.AppSettings["TestMode"] == "true" && id == _testEventId)
+                {
+                    return CreateTestEvent();
+                }
+
+                var service = new CalendarService(new BaseClientService.Initializer()
+                {
+                    ApiKey = _apiKey
+                });
+
+                EventsResource.GetRequest request = service.Events.Get(_calendarID, id);
+
+                Event targetEvent = request.Execute();
+
+                return MapToEventDto(targetEvent);
+            }
+            catch (Exception)
+            {
+                return MapToEventDto(null);
+            }
         }
 
     }
