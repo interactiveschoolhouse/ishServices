@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace IshServices.Controllers
@@ -17,7 +18,7 @@ namespace IshServices.Controllers
         // POST api/<controller>
         public IHttpActionResult Post([FromBody]ContactUs value)
         {
-            ContactUsService cus = new ContactUsService();
+            ContactUsService cus = new ContactUsService(new SendGridMailAdapter());
             cus.Send(value);
 
             return Ok(value);

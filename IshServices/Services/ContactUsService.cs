@@ -13,43 +13,33 @@ namespace IshServices.Services
 {
     public class ContactUsService
     {
+        public ContactUsService(MailAdapter mailAdapter)
+        {
+            this.mailAdapter = mailAdapter;
+        }
+        private MailAdapter mailAdapter;
+
         public void Send(ContactUs data)
         {
             ValidateInput(data);
 
-            using(SmtpClient client = new SmtpClient())
+            StringBuilder body = new StringBuilder();
+            body.AppendFormat("<div>Name: {0}</div>", data.Name);
+            body.AppendFormat("<div>Address: {0}</div>", data.Address);
+            body.AppendFormat("<div>Town: {0}</div>", data.Town);
+            body.AppendFormat("<div>Phone: {0}</div>", data.Phone);
+            body.AppendFormat("<div>Email: {0}</div>", data.Email);
+            body.AppendFormat("<div>Comments:</div><p>{0}</p>", data.Comments);
+
+            SiteMessage siteMessage = new SiteMessage()
             {
-                MailMessage message = new MailMessage();
+                From = data.Email,
+                To = ConfigurationManager.AppSettings["ContactUsEmailAddress"],
+                Subject = ConfigurationManager.AppSettings["ContactUsEmailSubject"],
+                Body = body.ToString()
+            };
 
-                message.From = new MailAddress(data.Email);
-                message.To.Add(new MailAddress(ConfigurationManager.AppSettings["ContactUsEmailAddress"]));
-
-                message.Subject = ConfigurationManager.AppSettings["ContactUsEmailSubject"];
-
-                message.IsBodyHtml = true;
-
-                StringBuilder body = new StringBuilder();
-                body.AppendFormat("<div>Name: {0}</div>", data.Name);
-                body.AppendFormat("<div>Address: {0}</div>", data.Address);
-                body.AppendFormat("<div>Town: {0}</div>", data.Town);
-                body.AppendFormat("<div>Phone: {0}</div>", data.Phone);
-                body.AppendFormat("<div>Email: {0}</div>", data.Email);
-                body.AppendFormat("<div>Comments:</div><p>{0}</p>", data.Comments);
-
-                message.Body = body.ToString();
-
-                if (ConfigurationManager.AppSettings["TestMode"] == "true")
-                {
-                    System.IO.File.AppendAllText(ConfigurationManager.AppSettings["TestPath"] + "\\sentEmails.html", 
-                        string.Format("{0}{1}{0}From:{2}{0}Subject:{3}{0}{4}{0}", 
-                        "<br/>", "-------------------------------", data.Email, message.Subject, body.ToString()));
-                }
-                else
-                {
-                    client.Send(message);
-                }
-
-            }
+            mailAdapter.Send(siteMessage);
         }
 
         private void ValidateInput(ContactUs data)
